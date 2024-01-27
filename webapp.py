@@ -20,13 +20,17 @@ def generate_content():
     # Get user inputs from the JSON data
     user_interests = data.get("interests")
     user_location = data.get("location")
-    #user_interests = "legos, beyblade, star wars"
-    #user_location = "Canada"
+    user_age = data.get("location")
+    user_friends = data.get("location")
 
     # Use Cohere to generate content based on user inputs
+    parameters = f'Friends:{user_friends}, Interests: {user_interests}, Location: {user_location}'
     generation_response = co.generate(
-        prompt=f'Please write a short story for nostalgia based on these parameters: {user_interests} {user_location}'
+        prompt=f'Please write a short story for nostalgia based on these parameters: {parameters}'
     )
+
+    # User's age & location used for childhood Spotify
+    
 
     # Access the 'text' attribute to get the generated content
     generated_content = generation_response[0].text

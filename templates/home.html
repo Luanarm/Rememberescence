@@ -11,15 +11,29 @@
   
   <form id="generateForm">
     <label>
-      Interests:
-      <input type="text" id="interests" />
+      How old are you?
+      <input type="text" id="age" />
     </label>
     <br />
+
     <label>
-      Location:
+      Where did you grow up?
       <input type="text" id="location" />
     </label>
     <br />
+    
+    <label>
+      Who were your childhood friends?
+      <input type="text" id="friends" />
+    </label>
+    <br />
+
+    <label>
+      What were your childhood interests/hobbies:
+      <input type="text" id="interests" />
+    </label>
+    <br />
+
     <button type="button" onclick="generateContent()">Generate</button>
   </form>
 
@@ -29,13 +43,15 @@
     function generateContent() {
       var interests = document.getElementById("interests").value;
       var location = document.getElementById("location").value;
+      var location = document.getElementById("friends").value;
+      var location = document.getElementById("age").value;
 
       fetch('/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ interests, location }),
+        body: JSON.stringify({ age, location, friends, interests }),
       })
       .then(response => response.json())
       .then(data => {
