@@ -7,6 +7,15 @@
 </head>
 <body>
 
+  {% if session %}
+  <h1>Welcome {{session.userinfo.name}}!</h1>
+  <p><a href="/logout">Logout</a></p>
+  <div><pre>{{pretty}}</pre></div>
+  {% else %}
+  <h1>Welcome Guest</h1>
+  <p><a href="/login">Login</a></p>
+  {% endif %}
+
   <h1>Flask Cohere App</h1>
   
   <form id="generateForm">
@@ -43,8 +52,8 @@
     function generateContent() {
       var interests = document.getElementById("interests").value;
       var location = document.getElementById("location").value;
-      var location = document.getElementById("friends").value;
-      var location = document.getElementById("age").value;
+      var friends = document.getElementById("friends").value;
+      var age = document.getElementById("age").value;
 
       fetch('/generate', {
         method: 'POST',
@@ -61,6 +70,8 @@
       .catch(error => console.error('Error:', error));
     }
   </script>
+
+  
 
 </body>
 </html>
