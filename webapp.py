@@ -104,5 +104,20 @@ def generate_content():
     # Return the JSON response with the generated content
     return jsonify({"generated_content": generated_content})
 
+@app.route("/refine", methods=["POST"])
+def refine_story():
+    data = request.json
+
+    # Get the previously generated content from the JSON data
+    generated_content = data.get("generated_content")
+
+    # Use Cohere to generate a new question based on the generated content
+    new_prompt = f'Based on this short story, come up with 1 short question to ask the user to get another parameter to put back into cohere: {generated_content}'
+    new_question_response = co.generate(prompt=new_prompt)
+    new_question = new_question_response[0].text
+
+    # Return the new question as JSON response
+    return jsonify({"new_question": new_question})
+
 if __name__ == '__main__':
     app.run(debug=True)
