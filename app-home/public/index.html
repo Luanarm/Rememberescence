@@ -1,31 +1,65 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <!--
-      Notice the use of %PUBLIC_URL% in the tag above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Cohere App</title>
+</head>
+<body>
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+  <h1>Flask Cohere App</h1>
+  
+  <form id="generateForm">
+    <label>
+      Interests:
+      <input type="text" id="interests" />
+    </label>
+    <br />
+    <label>
+      Location:
+      <input type="text" id="location" />
+    </label>
+    <label>
+      Age:
+      <input type="text" id="age" />
+    </label>
+    <label>
+      What genre would you like to listen to?:
+      <input type="text" id="genre" />
+    </label>
+    <br />
+    <button type="button" onclick="generateContent()">Generate</button>
+  </form>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  <div id="resultContainer"></div> <!-- Placeholder for the generated content -->
+  <div id="playlistStatus"></div> <!-- Placeholder for the playlist status -->
 
-      To begin the development, run `npm start`.
-      To create a production bundle, use `npm run build`.
-    -->
-  </body>
+  <script>
+    function generateContent() {
+      var interests = document.getElementById("interests").value;
+      var location = document.getElementById("location").value;
+      var age = document.getElementById("age").value;
+      var genre = document.getElementById("genre").value;
+
+      fetch('/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ interests, location, age, genre }), // Include age and genre in the request body
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Data received:', data);
+        document.getElementById("resultContainer").innerHTML = '<h2>Generated Content:</h2><p>' + data.generated_content + '</p>';
+
+        // Display playlist status
+        var playlistStatus = data.playlist_created ? 'Playlist created successfully!' : 'Failed to create playlist.';
+        document.getElementById("playlistStatus").innerHTML = '<h2>Playlist Status:</h2><p>' + playlistStatus + '</p>';
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  </script>
+
+</body>
 </html>
