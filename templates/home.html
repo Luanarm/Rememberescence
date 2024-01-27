@@ -19,28 +19,43 @@
       Location:
       <input type="text" id="location" />
     </label>
+    <label>
+      Age:
+      <input type="text" id="age" />
+    </label>
+    <label>
+      What genre would you like to listen to?:
+      <input type="text" id="genre" />
+    </label>
     <br />
     <button type="button" onclick="generateContent()">Generate</button>
   </form>
 
-  <div id="resultContainer"></div>
+  <div id="resultContainer"></div> <!-- Placeholder for the generated content -->
+  <div id="playlistStatus"></div> <!-- Placeholder for the playlist status -->
 
   <script>
     function generateContent() {
       var interests = document.getElementById("interests").value;
       var location = document.getElementById("location").value;
+      var age = document.getElementById("age").value;
+      var genre = document.getElementById("genre").value;
 
       fetch('/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ interests, location }),
+        body: JSON.stringify({ interests, location, age, genre }), // Include age and genre in the request body
       })
       .then(response => response.json())
       .then(data => {
         console.log('Data received:', data);
         document.getElementById("resultContainer").innerHTML = '<h2>Generated Content:</h2><p>' + data.generated_content + '</p>';
+
+        // Display playlist status
+        var playlistStatus = data.playlist_created ? 'Playlist created successfully!' : 'Failed to create playlist.';
+        document.getElementById("playlistStatus").innerHTML = '<h2>Playlist Status:</h2><p>' + playlistStatus + '</p>';
       })
       .catch(error => console.error('Error:', error));
     }
