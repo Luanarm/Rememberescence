@@ -8,13 +8,14 @@
 <body>
 
   {% if session %}
-  <h1>Welcome {{session.userinfo.name}}!</h1>
-  <p><a href="/logout">Logout</a></p>
-  <div><pre>{{pretty}}</pre></div>
-  {% else %}
-  <h1>Welcome Guest</h1>
-  <p><a href="/login">Login</a></p>
-  {% endif %}
+    <h1>Welcome {{ session.userinfo.name }}!</h1>
+    <p><a href="/logout">Logout</a></p>
+    {% else %}
+    <h1>Welcome to Rememberescence</h1>
+    <p><a href="/login">Login to get started!</a></p>
+    {% endif %}
+
+    
 
   <h1>Flask Cohere App</h1>
   
