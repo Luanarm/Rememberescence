@@ -1,2 +1,50 @@
-<h1>Empty</h1>
-<h2>Test<h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Cohere App</title>
+</head>
+<body>
+
+  <h1>Flask Cohere App</h1>
+  
+  <form id="generateForm">
+    <label>
+      Interests:
+      <input type="text" id="interests" />
+    </label>
+    <br />
+    <label>
+      Location:
+      <input type="text" id="location" />
+    </label>
+    <br />
+    <button type="button" onclick="generateContent()">Generate</button>
+  </form>
+
+  <div id="resultContainer"></div>
+
+  <script>
+    function generateContent() {
+      var interests = document.getElementById("interests").value;
+      var location = document.getElementById("location").value;
+
+      fetch('/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ interests, location }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Data received:', data);
+        document.getElementById("resultContainer").innerHTML = '<h2>Generated Content:</h2><p>' + data.generated_content + '</p>';
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  </script>
+
+</body>
+</html>
