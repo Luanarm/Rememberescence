@@ -48,6 +48,8 @@
     </form>
 
     <div id="resultContainer" class="mt-8"></div>
+    <div id="playlistStatus"></div> 
+
     <button type="button" id="refineButton" onclick="refineStory()" style="display: none;" class="block w-full py-2 px-4 rounded bg-blue-500 hover:bg-blue-400 text-white mt-4">Refine Story</button> 
   </div>
 
@@ -77,9 +79,19 @@
         return response.json();
       })
       .then(data => {
+        // console.log('Data received:', data);
+        // displayGeneratedContent(data.generated_content);
+        // document.getElementById("refineButton").style.display = "block";
+
         console.log('Data received:', data);
-        displayGeneratedContent(data.generated_content);
-        document.getElementById("refineButton").style.display = "block";
+        document.getElementById("resultContainer").innerHTML = '<h2>Generated Content:</h2><p>' + data.generated_content + '</p>';
+
+        // Display playlist status
+        var playlistStatus = data.playlist_created ? 'Playlist created successfully!' : 'Failed to create playlist.';
+        document.getElementById("playlistStatus").innerHTML = '<h2>Playlist Status:</h2><p>' + playlistStatus + '</p>';
+      
+
+
       })
       .catch(error => {
         console.error('Error:', error);

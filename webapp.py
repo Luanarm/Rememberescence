@@ -1,7 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 import cohere
 import requests
+
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 from base64 import b64encode
+
 
 app = Flask(__name__)
 
@@ -46,7 +50,7 @@ def generate_content():
 def get_spotify_access_token():
     SPOTIFY_CLIENT_ID = "0c29685d3fcb4c2b8f9903cf7238f15a"
     SPOTIFY_CLIENT_SECRET = "7710bfaff25748eaa626f5facfd2d89b"
-    SPOTIFY_AUTH_URL = "https://accounts.spotify.com/api/token"
+    SPOTIFY_AUTH_URL = "http://127.0.0.1:5000/callback"
 
     # Request access token from Spotify API
     auth_response = requests.post(
@@ -61,6 +65,7 @@ def get_spotify_access_token():
         return access_token
     else:
         return None
+
     
     
 
@@ -69,9 +74,9 @@ def generate_playlist(access_token, location, age, genre):
 
     if not tracks:
         return False
-    
+
     playlist_id = create_playlist(access_token)
-    
+
     if not playlist_id:
         return False  # Playlist creation failed
 
@@ -80,6 +85,7 @@ def generate_playlist(access_token, location, age, genre):
         return False  # Failed to add tracks to the playlist
 
     return True  # Playlist generated successfully
+
 
 def search_tracks(access_token, location, age, genre):
     # Construct the query string for searching tracks
