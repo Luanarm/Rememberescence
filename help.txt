@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Cohere App</title>
+    <link href="https://cdn.tailwindcss.com/3.0.7/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white min-h-screen flex items-center justify-center">
+  <div class="container mx-auto px-4">
+    {% if session %}
+    <h1 class="text-4xl font-bold mb-4">Welcome {{session.userinfo.name}}!</h1>
+    <p><a href="/logout" class="text-blue-300 hover:text-blue-100">Logout</a></p>
+    {% else %}
+    <h1 class="text-4xl font-bold mb-4">Welcome to Rememberescence</h1>
+    <p><a href="/login" class="text-blue-300 hover:text-blue-100">Login to get started!</a></p>
+    {% endif %}
+
+    <h1 class="text-3xl font-bold mb-4">Flask Cohere App</h1>
+    
+    <form id="generateForm" class="space-y-4">
+      <label>
+        How old are you?
+        <input type="text" id="age" class="block w-full py-2 px-4 rounded bg-white text-black" />
+      </label>
+
+      <label>
+        Where did you grow up?
+        <input type="text" id="location" class="block w-full py-2 px-4 rounded bg-white text-black" />
+      </label>
+      
+      <label>
+        Who were your childhood friends?
+        <input type="text" id="friends" class="block w-full py-2 px-4 rounded bg-white text-black" />
+      </label>
+
+      <label>
+        What were your childhood interests/hobbies:
+        <input type="text" id="interests" class="block w-full py-2 px-4 rounded bg-white text-black" />
+      </label>
+
+      <button type="button" onclick="generateContent()" class="block w-full py-2 px-4 rounded bg-blue-500 hover:bg-blue-400 text-white">Generate</button>
+      
+    </form>
+
+    <div id="resultContainer" class="mt-8"></div>
+    <button type="button" id="refineButton" onclick="refineStory()" style="display: none;" class="block w-full py-2 px-4 rounded bg-blue-500 hover:bg-blue-400 text-white mt-4">Refine Story</button> 
+  </div>
+
+  <script>
+    // Your existing JavaScript code...
+  </script>
+
+</body>
+</html>
