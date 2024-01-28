@@ -10,19 +10,16 @@
 <body class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white min-h-screen flex items-center justify-center">
   <div class="container mx-auto px-4">
     {% if session %}
-    <h1 class="text-4xl font-bold mb-4">Welcome {{session.userinfo.name}}!</h1>
+    <h1 class="text-4xl font-bold mb-4">Welcome!</h1>
     <p><a href="/logout" class="text-blue-300 hover:text-blue-100">Logout</a></p>
 
 
     {% else %}
-    <div class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white">
-      <h1 class="text-4xl font-bold mb-4">Welcome to Rememberescence</h1>
-      <p><a href="/login" class="text-blue-300 hover:text-blue-100">Login to get started!</a></p>
-    </div>
+    
     {% endif %} 
     
 
-    <h1 class="text-3xl font-bold mb-4">Flask Cohere App</h1>
+    <h1 class="text-3xl font-bold mb-4">Answer the questions below to get started</h1>
     <!-- <br> -->
     <form id="generateForm" class="space-y-4">
       <label>
@@ -50,11 +47,13 @@
 
       <br>
       <button type="button" onclick="generateContent()" class="block w-full py-2 px-4 rounded bg-blue-500 hover:bg-blue-400 text-white">Generate</button>
-      
+      <div id="loadingIcon" style="display: none;">
+        <img src="../static/loading.gif" alt="Loading..." width="50" height="50">
+      </div>
     </form>
 
     <div id="resultContainer" class="mt-8"></div>
-    <button type="button" id="refineButton" onclick="refineStory()" style="display: none;" class="block w-full py-2 px-4 rounded bg-blue-500 hover:bg-blue-400 text-white mt-4">Refine Story</button> 
+    <button type="button" id="refineButton" onclick="refineStory()" style="display: none; width: auto;" class="block py-2 px-4 rounded bg-blue-500 hover:bg-blue-400 text-white mt-4">Refine Story</button>
   </div>
 
   <script>
@@ -63,6 +62,8 @@
       const location = document.getElementById("location").value;
       const friends = document.getElementById("friends").value;
       const age = document.getElementById("age").value;
+
+      document.getElementById("loadingIcon").style.display = "block";
 
       if (!interests || !location || !friends || !age) {
         alert("Please fill in all the fields.");
@@ -90,6 +91,10 @@
       .catch(error => {
         console.error('Error:', error);
         alert("An error occurred while generating the content.");
+      })
+      .finally(() => {
+        // Hide loading icon
+        document.getElementById("loadingIcon").style.display = "none";
       });
     }
 
@@ -103,12 +108,7 @@
     }
 
     function refineStory() {
-      const generatedContent = document.getElementById("resultContainer").getAttribute("data-generated-content");
-
-      if (!generatedContent) {
-        alert("No content has been generated yet.");
-        return;
-      }
+      var generatedContent = document.getElementById("resultContainer").getAttribute("data-generated-content");
 
       fetch('/refine', {
         method: 'POST',
@@ -117,6 +117,54 @@
         },
         body: JSON.stringify({ generated_content: generatedContent }),
       })
+      .then(response => response.json())
+      .then(data => {
+        console.log('New question received:', data.new_question);
+        // Create a new element with the new question and set its ID
+        var newQuestionElement = document.createElement("div");
+        newQuestionElement.id = "newQuestion"; // Set the ID here
+        newQuestionElement.innerHTML = '<br><h2>New Question:' + data.new_question + '</h2>';
+        
+        // Append the new element to the result container
+        document.getElementById("resultContainer").appendChild(newQuestionElement);
+        
+        // Add input field and submit button
+        var userResponseElement = document.createElement("div");
+        userResponseElement.innerHTML = '<label for="userResponse">Your response:</label><br><textarea id="userResponse" rows="4" cols="50" style="color: black;"></textarea><br><button type="button" onclick="submitResponse()">Submit Response</button>';
+
+        document.getElementById("resultContainer").appendChild(userResponseElement);
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+
+    function displayNewQuestion(question) {
+      const resultContainer = document.getElementById("resultContainer");
+      resultContainer.innerHTML += `
+        <h2 class="text-2xl font-bold mb-4">New Question:</h2>
+        <p>${question}</p>
+        <label for="userResponse">Your response:</label><br>
+        <textarea id="userResponse" rows="4" cols="50" style="color: black;"></textarea><br>
+        <button type="button" onclick="submitResponse()">Submit Response</button>
+      `;
+    }
+
+    function submitResponse() {
+      var generatedContent = document.getElementById("resultContainer").getAttribute("data-generated-content");
+      var userResponse = document.getElementById("userResponse").value;
+      var newQuestion = document.getElementById("newQuestion").innerText;
+
+      fetch('/refined', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          generated_content: generatedContent, 
+          new_question: newQuestion,
+          new_question_input: userResponse 
+        }),
+      })
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -124,21 +172,13 @@
         return response.json();
       })
       .then(data => {
-        console.log('New question received:', data.new_question);
-        displayNewQuestion(data.new_question);
+        console.log('Refined result received:', data.refined_result);
+        document.getElementById("resultContainer").innerHTML += `
+          <h2 class="text-2xl font-bold mb-4">Refined Output:</h2>
+          <p>${data.refined_result}</p>
+        `;
       })
-      .catch(error => {
-        console.error('Error:', error);
-        alert("An error occurred while refining the story.");
-      });
-    }
-
-    function displayNewQuestion(question) {
-      const resultContainer = document.getElementById("resultContainer");
-      resultContainer.innerHTML += `
-        <h2 class="text-2xl font-bold mb-4">New Question:</h2>
-        <p>${question}</p>
-      `;
+      .catch(error => console.error('Error:', error));
     }
   </script>
 
