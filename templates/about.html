@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask Cohere App</title>
-</head>
-<body>
-    <h1>Welcome to Rememberescence</h1>
-    <p><a href="/login">Login to get started!</a></p>
+    <title>About Rememberescence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="logo.png">
     <style>
@@ -47,47 +43,14 @@
             color: #555;
         }
 
-        .hero-section {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            color: #fff;
-        }
-
-        .hero-section h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero-section p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            max-width: 500px;
-        }
-
-        .hero-section a {
-            background-color: #fff;
-            color: #333;
-            padding: 0.5rem 2rem;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .hero-section a:hover {
-            background-color: #f0f0f0;
-        }
-
         .about-section {
             background-color: #fff;
-            padding: 4rem;
+            padding: 4rem 2rem;
             text-align: center;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 4rem;
+            margin: 4rem auto;
+            max-width: 800px;
         }
 
         .about-section h2 {
@@ -115,14 +78,6 @@
         }
 
         @media (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 3rem;
-            }
-
-            .hero-section p {
-                font-size: 1.2rem;
-            }
-
             .about-section h2 {
                 font-size: 2rem;
             }
@@ -142,21 +97,15 @@
             </a>
         </div>
         <div>
-            <a href="/about">About</a>
-            <a href="/login">Login</a>
+            <a href="about.html">About</a>
+            <a href="home.html">Login</a>
         </div>
     </nav>
-
-    <div class="hero-section">
-        <h1>Welcome to Rememberescence</h1>
-        <p>Discover and share your memories with others.</p>
-        <a href="/login">Get Started</a>
-    </div>
 
     <div class="about-section">
         <h2>About Rememberescence</h2>
         <p>Rememberescence is a platform that allows you to discover and share your memories with others. By answering a few simple questions, we can generate a unique story that captures your childhood memories. Sign up now to get started!</p>
-        <a href="/login">Sign Up</a>
+        <a href="/login" class="underline">Sign Up</a>
     </div>
 </body>
 </html>
