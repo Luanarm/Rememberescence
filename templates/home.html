@@ -7,91 +7,138 @@
 </head>
 <body>
 
-  {% if session %}
-  <h1>Welcome {{session.userinfo.name}}!</h1>
-  <p><a href="/logout">Logout</a></p>
-  {% else %}
-  <h1>Welcome to Rememberescence</h1>
-  <p><a href="/login">Login to get started!</a></p>
-  {% endif %}
-
-  <h1>Flask Cohere App</h1>
+<h1>Flask Cohere App</h1>
   
-  <form id="generateForm">
-    <label>
-      How old are you?
-      <input type="text" id="age" />
-    </label>
-    <br />
+<form id="generateForm">
+  <label>
+    How old are you?
+    <input type="text" id="age" />
+  </label>
+  <br />
 
-    <label>
-      Where did you grow up?
-      <input type="text" id="location" />
-    </label>
-    <br />
+  <label>
+    Where did you grow up?
+    <input type="text" id="location" />
+  </label>
+  <br />
     
-    <label>
-      Who were your childhood friends?
-      <input type="text" id="friends" />
-    </label>
-    <br />
+  <label>
+    Who were your childhood friends?
+    <input type="text" id="friends" />
+  </label>
+  <br />
 
-    <label>
-      What were your childhood interests/hobbies:
-      <input type="text" id="interests" />
-    </label>
-    <br />
+  <label>
+    What were your childhood interests/hobbies:
+    <input type="text" id="interests" />
+  </label>
+  <br />
 
-    <button type="button" onclick="generateContent()">Generate</button>
+  <button type="button" onclick="generateContent()">Generate</button>
+  <div id="loadingIcon" style="display: none;">
+    <img src="../static/loading.gif" alt="Loading..." width="50" height="50"/>
+  </div>
+</form>
+
+<div id="resultContainer"></div>
+<button type="button" id="refineButton" onclick="refineStory()" style="display: none;">Refine Story</button>
+<div id="loadingIcon" style="display: none;">
+  <img src="../static/loading.gif" alt="Loading..." width="50" height="50"/>
+</div>
+
+<script>
+function generateContent() {
+  var interests = document.getElementById("interests").value;
+  var location = document.getElementById("location").value;
+  var friends = document.getElementById("friends").value;
+  var age = document.getElementById("age").value;
+
+  document.getElementById("loadingIcon").style.display = "block";
+
+  fetch('/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ age, location, friends, interests }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Data received:', data);
+    document.getElementById("resultContainer").innerHTML = '<h2>Generated Content:</h2><p>' + data.generated_content + '</p>';
+    document.getElementById("resultContainer").setAttribute("data-generated-content", data.generated_content);
+    document.getElementById("refineButton").style.display = "block";
+  })
+  .catch(error => console.error('Error:', error))
+  .finally(() => {
+    // Hide loading icon
+    document.getElementById("loadingIcon").style.display = "none";
+  });
+}
+
+function refineStory() {
+  var generatedContent = document.getElementById("resultContainer").getAttribute("data-generated-content");
+
+  document.getElementById("loadingIcon").style.display = "block";
+
+  fetch('/refine', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ generated_content: generatedContent }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('New question received:', data.new_question);
+    // Create a new element with the new question and set its ID
+    var newQuestionElement = document.createElement("div");
+    newQuestionElement.id = "newQuestion";
+    newQuestionElement.innerHTML = '<h2>New Question:</h2><p>' + data.new_question + '</p>';
     
-  </form>
+    // Append the new element to the result container
+    document.getElementById("resultContainer").appendChild(newQuestionElement);
+    
+    // Add input field and submit button
+    var userResponseElement = document.createElement("div");
+    userResponseElement.innerHTML = '<label for="userResponse">Your response:</label><br><textarea id="userResponse" rows="4" cols="50"></textarea><br><button type="button" onclick="submitResponse()">Submit Response</button>';
+    document.getElementById("resultContainer").appendChild(userResponseElement);
+  })
+  .catch(error => console.error('Error:', error))
+  .finally(() => {
+    // Hide loading icon
+    document.getElementById("loadingIcon").style.display = "none";
+  });
+}
 
-  <div id="resultContainer"></div>
-  <button type="button" id="refineButton" onclick="refineStory()" style="display: none;">Refine Story</button> 
-
-  <script>
-    function generateContent() {
-      var interests = document.getElementById("interests").value;
-      var location = document.getElementById("location").value;
-      var friends = document.getElementById("friends").value;
-      var age = document.getElementById("age").value;
-
-      fetch('/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ age, location, friends, interests }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Data received:', data);
-        document.getElementById("resultContainer").innerHTML = '<h2>Generated Content:</h2><p>' + data.generated_content + '</p>';
-        document.getElementById("resultContainer").setAttribute("data-generated-content", data.generated_content); // Store generated content as a data attribute
-        document.getElementById("refineButton").style.display = "block"; // Show the refine button after content generation
-      })
-      .catch(error => console.error('Error:', error));
+function submitResponse() {
+  
+  var generatedContent = document.getElementById("resultContainer").getAttribute("data-generated-content");
+  var userResponse = document.getElementById("userResponse").value;
+  var newQuestion = document.getElementById("newQuestion").innerText; // Get the new question text
+  
+  fetch('/refined', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ new_question: newQuestion, generated_content: generatedContent, new_question_input: userResponse }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
+    return response.json();
+  })
+  
+  .then(data => {
+    console.log('New question received:', data.refined_result);
+    document.getElementById("resultContainer").innerHTML += '<h2>Refined Output:</h2><p>' + data.refined_result + '</p>';
+  })
+  .catch(error => console.error('Error:', error));
+}
 
-    function refineStory() {
-      var generatedContent = document.getElementById("resultContainer").getAttribute("data-generated-content");
-
-      fetch('/refine', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ generated_content: generatedContent }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('New question received:', data.new_question);
-        // Update the UI to display the new question
-        document.getElementById("resultContainer").innerHTML += '<h2>New Question:</h2><p>' + data.new_question + '</p>';
-      })
-      .catch(error => console.error('Error:', error));
-    }
-  </script>
+</script>
 
 </body>
 </html>
